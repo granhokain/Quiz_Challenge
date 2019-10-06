@@ -9,7 +9,6 @@ Word quizzes app game, written in swift
 
 - Swift
 - MVVM
-- NSTimer
 - API
 
 ## Architecture
