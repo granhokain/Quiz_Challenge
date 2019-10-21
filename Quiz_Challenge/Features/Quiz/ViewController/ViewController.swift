@@ -20,6 +20,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     @IBOutlet weak var startButton: UIButton!
     
+    @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
+    
     private let viewModel =  QuizViewModel()
     
     var wordsTable = [String]()
@@ -37,7 +39,21 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         wordsTextField.isUserInteractionEnabled = false
         tableView.dataSource = self
         
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
         bindViewModel()
+    }
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+        if let keyboardFrame: NSValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRectangle = keyboardFrame.cgRectValue
+            let keyboardHeight = keyboardRectangle.height
+            bottomConstraint.constant = keyboardHeight
+        }
+    }
+    @objc func keyboardWillHide(notification _: NSNotification) {
+        bottomConstraint.constant = 0
     }
     
     
@@ -133,6 +149,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
     @objc func updateProdTimer() {
         if intProdSeconds! < 1 {
+            endGame()
             timer.invalidate()
             timerLabel.text = "00:00"
         }
